@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -7,7 +8,6 @@ import { AboutWindowContent } from '@/components/dashboard/AboutWindowContent';
 import { SkillsWindowContent } from '@/components/dashboard/SkillsWindowContent';
 import { ProjectsWindowContent } from '@/components/dashboard/ProjectsWindowContent';
 import { ContactWindowContent } from '@/components/dashboard/ContactWindowContent';
-import { Maximize, Minimize2, X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Balancer } from 'react-wrap-balancer';
 
@@ -71,7 +71,14 @@ export default function DashboardPage() {
   };
 
   const toggleMinimize = (id: string) => {
-    setWindows(windows.map(win => win.id === id ? {...win, isMinimized: !win.isMinimized} : win));
+    setWindows(windows.map(win => {
+      if (win.id === id) {
+        const newMaxZ = !win.isMinimized ? win.zIndex : maxZIndex + 1; // Bring to front if restoring
+        if (!win.isMinimized === false) setMaxZIndex(newMaxZ); // Update maxZIndex if restoring
+        return {...win, isMinimized: !win.isMinimized, zIndex: newMaxZ };
+      }
+      return win;
+    }));
   };
   
   const closeWindow = (id: string) => {
@@ -86,26 +93,43 @@ export default function DashboardPage() {
         setMaxZIndex(newMaxZ);
         return prevWindows.map(w => w.id === existingWindow.id ? {...w, isOpen: true, isMinimized: false, zIndex: newMaxZ} : w);
       }
+      // If window exists and is open, or doesn't exist but we want to create it (not implemented here, but for future)
+      // For now, just bring to front if already open but somehow hidden by dock logic (shouldn't happen with current setup)
+      if (existingWindow && existingWindow.isOpen) {
+         bringToFront(existingWindow.id);
+      }
       return prevWindows;
     });
   };
   
-  // Effect to adjust window positions on resize for mobile, or if they go out of bounds
   useEffect(() => {
-    if (isMobile === undefined) return; // Wait for isMobile to be defined
+    if (isMobile === undefined) return; 
 
     const updatePositions = () => {
       setWindows(currentWindows => currentWindows.map((win, index) => {
         if (isMobile) {
           return {
             ...win,
-            initialPosition: { x: 0, y: index * 60 }, // Stack them roughly on mobile
+            initialPosition: { x: 0, y: index * 60 }, 
             initialSize: { width: '100%', height: 'auto' },
           };
         }
-        // Basic boundary check for desktop (example)
-        const newX = Math.max(0, Math.min(win.initialPosition.x, window.innerWidth - (typeof win.initialSize.width === 'number' ? win.initialSize.width : 300)));
-        const newY = Math.max(0, Math.min(win.initialPosition.y, window.innerHeight - (typeof win.initialSize.height === 'number' ? win.initialSize.height : 200) - 100)); // -100 for header/footer
+        // Ensure windows stay somewhat within viewport on desktop, adjust if needed
+        // This is a basic boundary enforcement on resize or mobile switch
+        const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1024;
+        const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 768;
+        const headerHeightApproximation = 80; // Approximate height of header
+        const dockHeightApproximation = 50; // Approximate height of dock
+
+        let currentWidth = typeof win.initialSize.width === 'number' ? win.initialSize.width : parseInt(String(win.initialSize.width).replace('px', '').replace('%', ''));
+        if (String(win.initialSize.width).includes('%')) {
+            currentWidth = (viewportWidth * currentWidth) / 100;
+        }
+        currentWidth = Math.max(win.minSize?.width || 200, currentWidth);
+
+
+        const newX = Math.max(10, Math.min(win.initialPosition.x, viewportWidth - currentWidth - 10));
+        const newY = Math.max(10, Math.min(win.initialPosition.y, viewportHeight - headerHeightApproximation - dockHeightApproximation - 50)); // 50 is arbitrary minimum height for window content visibility
         
         return {
           ...win,
@@ -113,7 +137,13 @@ export default function DashboardPage() {
         };
       }));
     };
-    updatePositions(); // Initial call
+    updatePositions();
+    
+    if (typeof window !== 'undefined') {
+        window.addEventListener('resize', updatePositions);
+        return () => window.removeEventListener('resize', updatePositions);
+    }
+
   }, [isMobile]);
 
 
@@ -122,7 +152,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-8rem)] w-full overflow-hidden bg-background dark:bg-dot-white/[0.2] bg-dot-black/[0.2]">
+    <div className="relative min-h-[calc(100vh-8rem)] w-full bg-background dark:bg-dot-white/[0.2] bg-dot-black/[0.2]">
       {/* Radial gradient for subtle effect */}
       <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-background bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
       
@@ -147,18 +177,24 @@ export default function DashboardPage() {
         ))}
       </div>
       
-      {/* Dock/Taskbar for closed windows - simplistic example */}
       {!isMobile && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-card/80 backdrop-blur-md p-2 rounded-lg shadow-xl flex space-x-2">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-card/80 backdrop-blur-md p-2 rounded-lg shadow-xl flex space-x-2 z-[1000]">
           {initialWindowsConfig.map(cfg => {
             const winInstance = windows.find(w => w.title === cfg.title);
-            if (!winInstance || !winInstance.isOpen) {
+            // Show button if window is closed OR (it's open AND minimized - for quick restore via dock)
+            if (!winInstance || !winInstance.isOpen || (winInstance.isOpen && winInstance.isMinimized)) {
               return (
                 <button 
                   key={cfg.title} 
-                  onClick={() => openWindow(cfg.title)}
-                  className="p-2 hover:bg-accent rounded-md text-xs"
-                  title={`Open ${cfg.title}`}
+                  onClick={() => {
+                    if (winInstance && winInstance.isOpen && winInstance.isMinimized) {
+                      toggleMinimize(winInstance.id); // This will restore and bring to front
+                    } else {
+                      openWindow(cfg.title);
+                    }
+                  }}
+                  className="p-2 hover:bg-accent rounded-md text-xs text-card-foreground"
+                  title={`${winInstance && winInstance.isOpen && winInstance.isMinimized ? 'Restore' : 'Open'} ${cfg.title}`}
                 >
                   {cfg.title.substring(0,3)}...
                 </button>

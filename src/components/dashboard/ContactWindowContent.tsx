@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -7,23 +8,11 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Send } from 'lucide-react';
 import { Balancer } from 'react-wrap-balancer';
-// Placeholder for server action
-async function submitContactForm(data: ContactFormSchemaType): Promise<{ success: boolean; message: string }> {
-  console.log("Form data submitted (simulated):", data);
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  // Simulate success/failure
-  if (data.email.includes("error")) {
-    return { success: false, message: "Simulated server error. Please try again." };
-  }
-  return { success: true, message: "Your message has been sent successfully! I'll get back to you soon." };
-}
-
+import { submitContactForm, type ContactFormData } from '@/services/contactService'; // Updated import
 
 const contactFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -46,10 +35,9 @@ export function ContactWindowContent() {
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const onSubmit: SubmitHandler<ContactFormSchemaType> = async (data) => {
+  const onSubmit: SubmitHandler<ContactFormSchemaType> = async (data: ContactFormData) => { // Type data explicitly
     setIsSubmitting(true);
     try {
-      // In a real app, this would be a server action or API call
       const response = await submitContactForm(data);
       if (response.success) {
         toast({
@@ -65,9 +53,13 @@ export function ContactWindowContent() {
         });
       }
     } catch (error) {
+        let errorMessage = "An unexpected error occurred. Please try again.";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
       toast({
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

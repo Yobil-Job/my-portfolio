@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -121,9 +122,9 @@ export function AiPrompterDialog({ project, isOpen, onClose }: AiPrompterDialogP
           <Button variant="outline" onClick={handleClose}>Cancel</Button>
           <Button onClick={handleSubmit} disabled={isLoading}>
             {isLoading ? (
-              <>&lt;Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
             ) : (
-              <>&lt;Sparkles className="mr-2 h-4 w-4" /> Get Suggestions</>
+              <><Sparkles className="mr-2 h-4 w-4" /> Get Suggestions</>
             )}
           </Button>
         </DialogFooter>
