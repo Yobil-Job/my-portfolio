@@ -11,7 +11,10 @@ export function AboutWindowContent() {
     <div className="space-y-6 text-sm">
       <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
         <Avatar className="h-24 w-24 ring-2 ring-primary ring-offset-2 ring-offset-background">
-          <AvatarImage src="https://placehold.co/100x100.png" alt={developerInfo.name} data-ai-hint="profile portrait" />
+        <div className="w-24 h-24 rounded-full overflow-hidden">
+  <AvatarImage src="/images/developer.jpg" alt={developerInfo.name} className="object-cover w-full h-full" />
+</div>
+
           <AvatarFallback>{developerInfo.name.substring(0, 2).toUpperCase()}</AvatarFallback>
         </Avatar>
         <div className="text-center sm:text-left">

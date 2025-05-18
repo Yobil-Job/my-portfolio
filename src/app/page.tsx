@@ -9,8 +9,7 @@ import { SkillsWindowContent } from '@/components/dashboard/SkillsWindowContent'
 import { ProjectsWindowContent } from '@/components/dashboard/ProjectsWindowContent';
 import { ContactWindowContent } from '@/components/dashboard/ContactWindowContent';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Balancer } from 'react-wrap-balancer';
-import { UserCircle, Layers, FolderKanban, Mail, Dot } from 'lucide-react'; // Added icons
+import { UserCircle, Layers, FolderKanban, Mail, Dot } from 'lucide-react';
 
 export interface WindowConfig {
   title: string;
@@ -18,7 +17,7 @@ export interface WindowConfig {
   defaultSize: { width: string | number; height: string | number };
   minSize?: { width: number; height: number };
   contentKey: 'about' | 'skills' | 'projects' | 'contact';
-  icon: React.ElementType; // Added icon type
+  icon: React.ElementType;
 }
 
 export interface WindowInstance extends WindowConfig {
@@ -34,7 +33,7 @@ export interface WindowInstance extends WindowConfig {
 const initialWindowsSetup: WindowConfig[] = [
   { title: 'About Me', contentKey: 'about', defaultPosition: { x: 50, y: 50 }, defaultSize: { width: 480, height: 400 }, minSize: { width: 320, height: 250 }, icon: UserCircle },
   { title: 'Skills & Stack', contentKey: 'skills', defaultPosition: { x: 100, y: 100 }, defaultSize: { width: 420, height: 450 }, minSize: { width: 300, height: 300 }, icon: Layers },
-  { title: 'Projects', contentKey: 'projects', defaultPosition: { x: 150, y: 150 }, defaultSize: { width: 650, height: 550 }, minSize: { width: 320, height: 400 }, icon: FolderKanban }, // Adjusted Projects height
+  { title: 'Projects', contentKey: 'projects', defaultPosition: { x: 150, y: 150 }, defaultSize: { width: 650, height: 550 }, minSize: { width: 320, height: 400 }, icon: FolderKanban },
   { title: 'Contact', contentKey: 'contact', defaultPosition: { x: 200, y: 200 }, defaultSize: { width: 430, height: 480 }, minSize: { width: 300, height: 350 }, icon: Mail },
 ];
 
@@ -59,7 +58,7 @@ export default function DashboardPage() {
         currentPosition: cfg.defaultPosition,
         currentSize: cfg.defaultSize,
         zIndex: 10 + index,
-        isOpen: false, // All windows start closed
+        isOpen: false, 
         isMinimized: false,
       }))
     );
@@ -152,8 +151,8 @@ export default function DashboardPage() {
       if (isMobile) {
         return {
           ...win,
-          currentPosition: { x: 10, y: (index * 40) + 10 }, // Slightly offset for mobile
-          currentSize: { width: 'calc(100% - 20px)', height: 'auto' }, // Full width with some padding
+          currentPosition: { x: 10, y: (index * 40) + 10 }, 
+          currentSize: { width: 'calc(100% - 20px)', height: 'auto' }, 
         };
       } else {
         return {
@@ -171,10 +170,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-8rem)] w-full bg-background dark:bg-dot-white/[0.2] bg-dot-black/[0.2] overflow-auto">
-      {/* Background pattern */}
-      <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-background bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
-      
+    <div className="relative min-h-[calc(100vh-8rem)] w-full overflow-auto dashboard-animated-background">
       {/* Container for Draggable Windows */}
       <div className="p-4 md:p-0">
         {windows.filter(w => w.isOpen).map((win) => (
@@ -238,5 +234,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    

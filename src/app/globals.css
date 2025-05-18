@@ -95,3 +95,35 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   @apply bg-primary;
 }
+
+/* Animated Gradient Background */
+@keyframes animatedGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.dashboard-animated-background {
+  background: linear-gradient(
+    -45deg, 
+    hsl(var(--accent) / 0.6), 
+    hsl(var(--primary) / 0.5), 
+    hsl(var(--secondary) / 0.6), 
+    hsl(var(--background) / 0.8) /* Blend with base background */
+  );
+  background-size: 300% 300%; /* Make it larger to allow for smooth animation */
+  animation: animatedGradient 25s ease infinite; /* Slower animation */
+  color: hsl(var(--foreground)); /* Ensure text contrast */
+}
+
+.dark .dashboard-animated-background {
+   background: linear-gradient(
+    -45deg, 
+    hsl(var(--accent) / 0.5), 
+    hsl(var(--primary) / 0.4), 
+    hsl(var(--secondary) / 0.5), 
+    hsl(var(--background) / 0.7) /* Blend with base background */
+  );
+  background-size: 300% 300%;
+  animation: animatedGradient 25s ease infinite;
+}
