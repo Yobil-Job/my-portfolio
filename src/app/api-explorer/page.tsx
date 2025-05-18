@@ -1,3 +1,4 @@
+
 "use client";
 
 import { EndpointDetail, EndpointData } from '@/components/api-explorer/EndpointDetail';
@@ -34,7 +35,7 @@ const apiEndpoints: EndpointData[] = [
   {
     method: 'POST',
     path: '/contact',
-    description: 'Submits a contact message to the developer.',
+    description: 'Submits a contact message to the developer. The request sample shows example values; replace them with actual data when making a call.',
     requestBody: {
       contentType: 'application/json',
       schema: {
@@ -48,9 +49,9 @@ const apiEndpoints: EndpointData[] = [
       },
     },
     requestSample: {
-      name: 'Jane Doe',
-      email: 'jane.doe@example.com',
-      message: 'Hello, I would like to connect regarding a project.',
+      name: 'Your Name',
+      email: 'your.email@example.com',
+      message: 'Your message to the developer.',
     },
     responseSample: {
       success: true,
@@ -82,3 +83,5 @@ export default function ApiExplorerPage() {
     </div>
   );
 }
+
+    
