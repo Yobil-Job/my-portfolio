@@ -14,7 +14,7 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
           <Code className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg">Eyob's API Portfolio</span>
+          <span className="font-bold text-lg">Eyob's Portfolio</span>
         </Link>
         <nav className="flex items-center space-x-2 sm:space-x-4">
           <Button variant="ghost" asChild>

@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Eyob's API Portfolio",
-  description: 'Portfolio of Eyob Weldetensay, Backend Developer &amp; Aspiring Cloud Engineer.',
+  title: "Eyob's Portfolio",
+  description: 'Portfolio of Eyob Weldetensay, Backend Developer & Aspiring Cloud Engineer.',
 };
 
 export default function RootLayout({
