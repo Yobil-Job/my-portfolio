@@ -1,4 +1,6 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/suggest-project-improvements.ts';
+// Remove or comment out the old flow if it's no longer needed
+// import '@/ai/flows/suggest-project-improvements.ts'; 
+import '@/ai/flows/answer-project-question.ts';

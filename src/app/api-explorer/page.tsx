@@ -35,7 +35,7 @@ const apiEndpoints: EndpointData[] = [
   {
     method: 'POST',
     path: '/contact',
-    description: 'Submits a contact message to the developer. The request sample shows example values; replace them with actual data when making a call.',
+    description: 'Submits a contact message to the developer. The request sample shows example placeholder values; replace them with actual data when making a call. The functional contact form is available on the main dashboard.',
     requestBody: {
       contentType: 'application/json',
       schema: {
@@ -50,8 +50,8 @@ const apiEndpoints: EndpointData[] = [
     },
     requestSample: {
       name: 'Your Name',
-      email: 'your.email@example.com',
-      message: 'Your message to the developer.',
+      email: 'your.email@example.com', // Generic placeholder
+      message: 'Your message to the developer.', // Generic placeholder
     },
     responseSample: {
       success: true,
@@ -70,7 +70,7 @@ export default function ApiExplorerPage() {
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           <Balancer>
             Explore the mock API endpoints that represent the data structure of this portfolio. 
-            These demonstrate how data might be fetched and interacted with.
+            These demonstrate how data might be fetched and interacted with. The actual contact form is on the dashboard.
           </Balancer>
         </p>
       </header>
@@ -83,5 +83,3 @@ export default function ApiExplorerPage() {
     </div>
   );
 }
-
-    

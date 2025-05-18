@@ -1,4 +1,6 @@
 // src/ai/flows/suggest-project-improvements.ts
+// This file can be deleted or kept for future reference if the suggestion feature might be re-added.
+// For now, it's replaced by the answer-project-question.ts flow for the AI dialog.
 'use server';
 
 /**
@@ -38,7 +40,8 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestProjectImprovementsOutputSchema},
   prompt: `You are an AI assistant that helps developers improve the discoverability and appeal of their projects.
 
-  Given the current project title, description, and tags, suggest improvements to each of them.
+  Given the current project title,
+  description, and tags, suggest improvements to each of them.
 
   Current Title: {{{title}}}
   Current Description: {{{description}}}
