@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -22,6 +23,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Eyob's Portfolio",
   description: 'Portfolio of Eyob Weldetensay, Backend Developer & Aspiring Cloud Engineer.',
+  icons: {
+    icon: '/images/developer.jpg', // Path relative to the public directory
+  },
 };
 
 export default function RootLayout({
