@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -43,21 +44,16 @@ export function DraggableWindow({
   useEffect(() => {
     // If mobile, use full width and auto height, and reset position
     if (isMobile) {
-      setPosition({ x: 0, y: 0 }); // Position will be handled by flex/grid in parent
+      setPosition({ x: 0, y: 0 }); 
       setSize({ width: '100%', height: 'auto' });
     } else {
+      // When switching from mobile to desktop, or on initial desktop load,
+      // ensure position and size are based on current props.
       setPosition(initialPosition);
       setSize(initialSize);
     }
   }, [isMobile, initialPosition, initialSize]);
 
-  const handleDrag = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (isMobile) return; // Disable dragging on mobile
-    setPosition({
-      x: position.x + info.delta.x,
-      y: position.y + info.delta.y,
-    });
-  };
 
   if (isMobile) {
     // Render as a static card on mobile
@@ -66,7 +62,7 @@ export function DraggableWindow({
         id={id}
         className="mb-4 w-full rounded-2xl bg-card shadow-2xl flex flex-col"
         style={{ minHeight: typeof minSize.height === 'number' ? minSize.height : 'auto' }}
-        onClick={onFocus} // Still bring to front conceptually if needed for other interactions
+        onClick={onFocus}
       >
         <header className="flex items-center justify-between p-3 border-b window-header-gradient rounded-t-2xl">
           <h2 className="font-semibold text-sm truncate text-card-foreground">{title}</h2>
@@ -97,19 +93,29 @@ export function DraggableWindow({
       <motion.div
         id={id}
         drag={!isMobile && !isMinimized}
-        dragControls={undefined} // Using default drag
-        dragListener={!isMobile && !isMinimized} // Only listen to drag if not mobile/minimized
+        dragConstraints={constraintsRef}
         dragMomentum={false}
-        onDrag={handleDrag}
-        initial={false} // Do not animate on initial render using Framer's initial
-        animate={{ x: position.x, y: position.y, width: size.width, height: isMinimized ? 40 : size.height }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        onDragEnd={(event, info: PanInfo) => {
+            if (!isMobile) {
+                setPosition(prevPos => ({
+                    x: prevPos.x + info.offset.x,
+                    y: prevPos.y + info.offset.y
+                }));
+            }
+        }}
         style={{
+          x: position.x,
+          y: position.y,
           zIndex,
           position: 'absolute',
           minWidth: minSize.width,
           minHeight: isMinimized ? 'auto' : minSize.height,
         }}
+        animate={{
+            width: size.width,
+            height: isMinimized ? 40 : size.height,
+        }}
+        transition={{ type: 'spring', stiffness: 200, damping: 25 }} // For size changes and programmatic moves if position state changes elsewhere
         className="rounded-2xl bg-card shadow-2xl flex flex-col overflow-hidden border"
         onMouseDown={onFocus}
         onTouchStart={onFocus}
