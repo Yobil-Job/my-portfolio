@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   title: "Eyob's Portfolio",
   description: 'Portfolio of Eyob Weldetensay, Backend Developer & Aspiring Cloud Engineer.',
   icons: {
-    icon: '/images/developer.jpg', // Path relative to the public directory
+    icon: '/images/favicon-32x32.png', // Path relative to the public directory
   },
 };
 
