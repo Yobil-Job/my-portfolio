@@ -10,13 +10,15 @@ import { ProjectsWindowContent } from '@/components/dashboard/ProjectsWindowCont
 import { ContactWindowContent } from '@/components/dashboard/ContactWindowContent';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Balancer } from 'react-wrap-balancer';
+import { UserCircle, Layers, FolderKanban, Mail, Dot } from 'lucide-react'; // Added icons
 
 export interface WindowConfig {
   title: string;
   defaultPosition: { x: number; y: number };
   defaultSize: { width: string | number; height: string | number };
   minSize?: { width: number; height: number };
-  contentKey: 'about' | 'skills' | 'projects' | 'contact'; // To map to content components
+  contentKey: 'about' | 'skills' | 'projects' | 'contact';
+  icon: React.ElementType; // Added icon type
 }
 
 export interface WindowInstance extends WindowConfig {
@@ -30,10 +32,10 @@ export interface WindowInstance extends WindowConfig {
 }
 
 const initialWindowsSetup: WindowConfig[] = [
-  { title: 'About Me', contentKey: 'about', defaultPosition: { x: 50, y: 50 }, defaultSize: { width: 480, height: 400 }, minSize: { width: 320, height: 250 } },
-  { title: 'Skills & Stack', contentKey: 'skills', defaultPosition: { x: 100, y: 100 }, defaultSize: { width: 420, height: 450 }, minSize: { width: 300, height: 300 } },
-  { title: 'Projects', contentKey: 'projects', defaultPosition: { x: 150, y: 150 }, defaultSize: { width: 650, height: 500 }, minSize: { width: 320, height: 400 } },
-  { title: 'Contact', contentKey: 'contact', defaultPosition: { x: 200, y: 200 }, defaultSize: { width: 430, height: 480 }, minSize: { width: 300, height: 350 } },
+  { title: 'About Me', contentKey: 'about', defaultPosition: { x: 50, y: 50 }, defaultSize: { width: 480, height: 400 }, minSize: { width: 320, height: 250 }, icon: UserCircle },
+  { title: 'Skills & Stack', contentKey: 'skills', defaultPosition: { x: 100, y: 100 }, defaultSize: { width: 420, height: 450 }, minSize: { width: 300, height: 300 }, icon: Layers },
+  { title: 'Projects', contentKey: 'projects', defaultPosition: { x: 150, y: 150 }, defaultSize: { width: 650, height: 550 }, minSize: { width: 320, height: 400 }, icon: FolderKanban }, // Adjusted Projects height
+  { title: 'Contact', contentKey: 'contact', defaultPosition: { x: 200, y: 200 }, defaultSize: { width: 430, height: 480 }, minSize: { width: 300, height: 350 }, icon: Mail },
 ];
 
 const WindowContentMap = {
@@ -48,7 +50,6 @@ export default function DashboardPage() {
   const [maxZIndex, setMaxZIndex] = useState(10);
   const isMobile = useIsMobile();
 
-  // Initialize windows state from config, but all closed initially
   useEffect(() => {
     setWindows(
       initialWindowsSetup.map((cfg, index) => ({
@@ -57,12 +58,12 @@ export default function DashboardPage() {
         content: WindowContentMap[cfg.contentKey],
         currentPosition: cfg.defaultPosition,
         currentSize: cfg.defaultSize,
-        zIndex: 10 + index, // Initial z-index, will be updated on focus
+        zIndex: 10 + index,
         isOpen: false, // All windows start closed
         isMinimized: false,
       }))
     );
-  }, []); // Run once on mount
+  }, []);
 
 
   const bringToFront = useCallback((id: string) => {
@@ -85,22 +86,18 @@ export default function DashboardPage() {
       setMaxZIndex(newMaxZ);
 
       if (existingWindow) {
-        // If window exists, open it (if closed/minimized) and bring to front
-        return prevWindows.map(w => 
-          w.title === title 
-            ? { ...w, 
-                isOpen: true, 
-                isMinimized: false, 
+        return prevWindows.map(w =>
+          w.title === title
+            ? { ...w,
+                isOpen: true,
+                isMinimized: false,
                 zIndex: newMaxZ,
-                // Reset to default position/size if it was previously closed, or keep current if just minimized
                 currentPosition: !w.isOpen ? winConfig.defaultPosition : w.currentPosition,
                 currentSize: !w.isOpen ? winConfig.defaultSize : w.currentSize,
-              } 
+              }
             : w
         );
       } else {
-        // This case should ideally not happen if windows state is initialized correctly
-        // from initialWindowsSetup. If it does, it means a new window is being created.
         const newWindow: WindowInstance = {
           ...winConfig,
           id: uuidv4(),
@@ -121,7 +118,7 @@ export default function DashboardPage() {
       if (win.id === id) {
         const newMinimizedState = !win.isMinimized;
         let newZ = win.zIndex;
-        if (!newMinimizedState) { // If restoring
+        if (!newMinimizedState) { 
           const newMaxZ = maxZIndex + 1;
           setMaxZIndex(newMaxZ);
           newZ = newMaxZ;
@@ -131,7 +128,7 @@ export default function DashboardPage() {
       return win;
     }));
   }, [maxZIndex, setMaxZIndex]);
-  
+
   const closeWindow = useCallback((id: string) => {
      setWindows(prevWindows => prevWindows.map(win => win.id === id ? {...win, isOpen: false} : win));
   }, []);
@@ -155,13 +152,10 @@ export default function DashboardPage() {
       if (isMobile) {
         return {
           ...win,
-          currentPosition: { x: 0, y: index * 60 }, // Basic stacking for mobile
-          currentSize: { width: '100%', height: 'auto' },
+          currentPosition: { x: 10, y: (index * 40) + 10 }, // Slightly offset for mobile
+          currentSize: { width: 'calc(100% - 20px)', height: 'auto' }, // Full width with some padding
         };
       } else {
-        // On switch to desktop, if window was open, restore to its default or last desktop size/pos
-        // For simplicity, if coming from mobile, reset to default.
-        // A more complex state management would be needed to remember desktop pos/size.
         return {
             ...win,
             currentPosition: win.defaultPosition,
@@ -178,9 +172,11 @@ export default function DashboardPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-8rem)] w-full bg-background dark:bg-dot-white/[0.2] bg-dot-black/[0.2] overflow-auto">
+      {/* Background pattern */}
       <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-background bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
       
-      <div className="p-4 space-y-4 md:p-0 md:space-y-0">
+      {/* Container for Draggable Windows */}
+      <div className="p-4 md:p-0">
         {windows.filter(w => w.isOpen).map((win) => (
           <DraggableWindow
             key={win.id}
@@ -191,7 +187,6 @@ export default function DashboardPage() {
             minSize={win.minSize}
             zIndex={win.zIndex}
             onDragStop={updateWindowPosition}
-            // onResizeStop={updateWindowSize} // Future: Implement resize
             onFocus={() => bringToFront(win.id)}
             onClose={() => closeWindow(win.id)}
             onMinimize={() => toggleMinimize(win.id)}
@@ -203,6 +198,7 @@ export default function DashboardPage() {
         ))}
       </div>
       
+      {/* Desktop Dock */}
       {!isMobile && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-card/80 backdrop-blur-md p-2 rounded-lg shadow-xl flex space-x-2 z-[1000]">
           {initialWindowsSetup.map(cfg => {
@@ -210,28 +206,29 @@ export default function DashboardPage() {
             const isOpenAndNotMinimized = winInstance && winInstance.isOpen && !winInstance.isMinimized;
             const isMinimized = winInstance && winInstance.isOpen && winInstance.isMinimized;
 
-            let actionText = `Open ${cfg.title}`;
-            if (isOpenAndNotMinimized) actionText = `Focus ${cfg.title}`;
-            if (isMinimized) actionText = `Restore ${cfg.title}`;
+            let actionVerb = "Open";
+            if (isOpenAndNotMinimized) actionVerb = "Focus";
+            if (isMinimized) actionVerb = "Restore";
             
+            const IconComponent = cfg.icon;
+
             return (
               <button 
                 key={cfg.title} 
                 onClick={() => {
-                  if (isMinimized) {
-                    toggleMinimize(winInstance!.id); // Restore and bring to front
+                  if (isMinimized && winInstance) {
+                    toggleMinimize(winInstance.id);
                   } else {
-                    openWindow(cfg.title); // Opens or brings to front
+                    openWindow(cfg.title); 
                   }
                 }}
-                className="p-2 hover:bg-accent rounded-md text-xs text-card-foreground"
-                title={actionText}
+                className="relative p-3 hover:bg-accent/80 rounded-lg text-card-foreground transition-colors flex flex-col items-center w-20 group"
+                title={`${actionVerb} ${cfg.title}`}
               >
-                {/* Simple icon representation, could be actual icons later */}
-                {cfg.title.substring(0,1)}
-                {/* Visual indicator for open/minimized state */}
+                <IconComponent className="h-6 w-6 mb-1 text-primary group-hover:text-accent-foreground" />
+                <span className="text-xs truncate w-full text-center">{cfg.title}</span>
                 {(isOpenAndNotMinimized || isMinimized) && 
-                  <span className={`absolute bottom-0.5 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full ${isMinimized ? 'bg-amber-500' : 'bg-green-500'}`}></span>
+                  <Dot className={`absolute -bottom-2 -right-0.5 h-5 w-5 ${isMinimized ? 'text-amber-500' : 'text-green-500'}`} />
                 }
               </button>
             );
