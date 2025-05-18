@@ -106,24 +106,24 @@ body {
 .dashboard-animated-background {
   background: linear-gradient(
     -45deg, 
-    hsl(var(--accent) / 0.6), 
-    hsl(var(--primary) / 0.5), 
-    hsl(var(--secondary) / 0.6), 
-    hsl(var(--background) / 0.8) /* Blend with base background */
+    hsl(var(--primary) / 0.6),      /* Primary color with some transparency */
+    hsl(var(--accent) / 0.45),     /* Accent color with more transparency */
+    hsl(var(--chart-4) / 0.3),     /* A contrasting chart color (Yellow-Orange) with high transparency */
+    hsl(var(--background) / 0.7)   /* Background color, more opaque to blend smoothly */
   );
-  background-size: 300% 300%; /* Make it larger to allow for smooth animation */
-  animation: animatedGradient 25s ease infinite; /* Slower animation */
-  color: hsl(var(--foreground)); /* Ensure text contrast */
+  background-size: 400% 400%; /* Larger size for smoother, slower animation */
+  animation: animatedGradient 30s ease infinite; /* Slower animation */
+  color: hsl(var(--foreground)); 
 }
 
 .dark .dashboard-animated-background {
    background: linear-gradient(
     -45deg, 
-    hsl(var(--accent) / 0.5), 
-    hsl(var(--primary) / 0.4), 
-    hsl(var(--secondary) / 0.5), 
-    hsl(var(--background) / 0.7) /* Blend with base background */
+    hsl(var(--primary) / 0.5),      /* Primary color (dark theme version) */
+    hsl(var(--accent) / 0.35),     /* Accent color (dark theme version) */
+    hsl(var(--chart-2) / 0.25),    /* A different contrasting chart color for dark mode (Greenish) */
+    hsl(var(--background) / 0.6)   /* Background color (dark theme version), more opaque */
   );
-  background-size: 300% 300%;
-  animation: animatedGradient 25s ease infinite;
+  background-size: 400% 400%;
+  animation: animatedGradient 30s ease infinite;
 }
